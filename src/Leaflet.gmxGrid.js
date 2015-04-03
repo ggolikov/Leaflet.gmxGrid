@@ -3,8 +3,8 @@ var gridSteps = [0.001, 0.002, 0.0025, 0.005, 0.01, 0.02, 0.025, 0.05, 0.1, 0.2,
     gridStepsLength = gridSteps.length,
     formatFloat = function (f) {
         f %= 360;
-        if (f > 180) {f -= 360;}
-        else if (f < -180) {f += 360;}
+        if (f > 180) { f -= 360; }
+        else if (f < -180) { f += 360; }
         return Math.round(f * 1000.0) / 1000.0;
     };
 
@@ -42,7 +42,7 @@ L.GmxGrid = L.Polyline.extend({
     },
 
     repaint: function() {
-        if (!this._map) {return false;}
+        if (!this._map) { return false; }
         var map = this._map,
             w = map._size.x / 80,
             h = map._size.y / 80,
@@ -60,9 +60,9 @@ L.GmxGrid = L.Polyline.extend({
         } else {
             for (i = 0; i < gridStepsLength; i++) {
                 var step = gridSteps[i];
-                if (xStep === 0 && x21 / step < w) {xStep = step;}
-                if (yStep === 0 && y21 / step < h) {yStep = step;}
-                if (xStep > 0 && yStep > 0) {break;}
+                if (xStep === 0 && x21 / step < w) { xStep = step; }
+                if (yStep === 0 && y21 / step < h) { yStep = step; }
+                if (xStep > 0 && yStep > 0) { break; }
             }
         }
 
@@ -73,13 +73,13 @@ L.GmxGrid = L.Polyline.extend({
         for (i = Math.floor(x1 / xStep), len1 = Math.ceil(x2 / xStep); i < len1; i++) {
             var x = i * xStep;
             latlngArr.push(new L.LatLng(y2, x), new L.LatLng(y1, x));
-            if (isOneDegree && zoom < 6) {continue;}
+            if (isOneDegree && zoom < 6) { continue; }
             textMarkers.push(formatFloat(x) + '°', '');
         }
         for (i = Math.floor(y1 / yStep), len1 = Math.ceil(y2 / yStep); i < len1; i++) {
             var y = i * yStep;
             latlngArr.push(new L.LatLng(y, x1), new L.LatLng(y, x2));
-            if (isOneDegree && zoom < 6) {continue;}
+            if (isOneDegree && zoom < 6) { continue; }
             textMarkers.push(formatFloat(y) + '°', '');
         }
         this.setStyle({'stroke': true, 'weight': 1, 'color': this.options.color});
@@ -89,7 +89,7 @@ L.GmxGrid = L.Polyline.extend({
     },
 
     _getPathPartStr: function (points) {
-        if (this._containerText) {this._container.removeChild(this._containerText);}
+        if (this._containerText) { this._container.removeChild(this._containerText); }
         this._containerText = this._createElement('g');
         this._containerText.setAttribute('stroke-width', 0);
 
@@ -114,7 +114,7 @@ L.GmxGrid = L.Polyline.extend({
                 var text = this._createElement('text'),
                     dx = 0,
                     dy = 3;
-                if (p.y === p1.y) {dx = 20;}
+                if (p.y === p1.y) { dx = 20; }
                 if (p.x === p1.x) {
                     text.setAttribute('text-anchor', 'middle');
                     dy = 20;
