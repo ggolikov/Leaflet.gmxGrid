@@ -7,4 +7,4 @@ Drawing grid.
 
 Demos
 ------
-  * [Drawing grid](http://originalsin.github.io/Leaflet.gmxGrid/examples/Leaflet.gmxGrid.html) - demonstrates work with L.gmxGrid object.
+  * [Drawing grid](http://scanex.github.io/Leaflet.gmxGrid/examples/Leaflet.gmxGrid.html) - demonstrates work with L.gmxGrid object.
