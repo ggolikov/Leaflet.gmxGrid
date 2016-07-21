@@ -13,6 +13,7 @@ L.GmxGrid = L.Polyline.extend({
         isOneDegree: false,  // draw with 1°
         color: 'black',
         noClip: true,
+        customGridStep: null,
         clickable: false
     },
 
@@ -30,26 +31,27 @@ L.GmxGrid = L.Polyline.extend({
         this.repaint();
     },
 
+    setStep: function (input) {
+        if (!input || isNaN(input) || input <= 0) {
+            return;
+        }
+        this.options.customGridStep = Number(input);
+        this.repaint();
+    },
+
+    clearStep: function () {
+        this.options.customGridStep = null;
+        this.repaint();
+    },
+
     onAdd: function (map) {
         L.Polyline.prototype.onAdd.call(this, map);
-        map.on('move', this.repaint, this);
-
-        var blm = map.gmxBaseLayersManager;
-        this._baselayerCheck = function (ev) {
-            var blayer = ev.baseLayer,
-                color = blayer && blayer.options.overlayColor || 'black';
-            if (this.options.color !==  color) {
-                this.setColor(color);
-            }
-        };
-        blm.on('baselayerchange', this._baselayerCheck, this);
-        this._baselayerCheck({baseLayer: blm.get(blm.getCurrentID())});
+        map.on('moveend', this.repaint, this);
         this.repaint();
     },
 
     onRemove: function (map) {
-        map.off('move', this.repaint, this);
-        map.gmxBaseLayersManager.off('baselayerchange', this._baselayerCheck, this);
+        map.off('moveend', this.repaint, this);
         L.Polyline.prototype.onRemove.call(this, map);
     },
 
@@ -66,9 +68,14 @@ L.GmxGrid = L.Polyline.extend({
             x21 = x2 - x1,   y21 = y2 - y1,
             xStep = 0, yStep = 0,
             i, len1,
-            isOneDegree = this.options.isOneDegree;
+            isOneDegree = this.options.isOneDegree,
+            customGridStep = this.options.customGridStep,
+            centerY = (map.getCenter().lat * Math.PI) / 180;
         if (isOneDegree) {
             xStep = yStep = 1;
+        } else if (customGridStep) {
+                xStep = (customGridStep/111.31949)/Math.cos(centerY),
+                yStep = customGridStep/111.31949;
         } else {
             for (i = 0; i < gridStepsLength; i++) {
                 var step = gridSteps[i];
@@ -86,12 +93,14 @@ L.GmxGrid = L.Polyline.extend({
             var x = i * xStep;
             latlngArr.push(new L.LatLng(y2, x), new L.LatLng(y1, x));
             if (isOneDegree && zoom < 6) { continue; }
+            if (customGridStep && (x21 / xStep > w && y21 / yStep > h)) { continue; }
             textMarkers.push(formatFloat(x) + '°', '');
         }
         for (i = Math.floor(y1 / yStep), len1 = Math.ceil(y2 / yStep); i < len1; i++) {
             var y = i * yStep;
             latlngArr.push(new L.LatLng(y, x1), new L.LatLng(y, x2));
             if (isOneDegree && zoom < 6) { continue; }
+            if (customGridStep && (x21 / xStep > w && y21 / yStep > h)) { continue; }
             textMarkers.push(formatFloat(y) + '°', '');
         }
         this.setStyle({'stroke': true, 'weight': 1, 'color': this.options.color});

@@ -24,7 +24,7 @@
             text-align: center;
 			z-index: 1;
         }
-        
+
         #info {
 			background-color: #ffffff;
 			border-radius: 5px;
@@ -37,7 +37,11 @@
 	<div id="map"></div>
     <div id="infoPanel">
         <span id="info">
-                Click for set white <button id="changeFormat">grid color</button>
+                <!-- Click for set white <button id="changeFormat">grid color</button> -->
+								Set step (km):
+								<input id="step" type="text"></input>
+								<button id="setStep">set step</button>
+								<button id="resetStep">reset step</button>
         </span>
     </div>
 
@@ -50,12 +54,24 @@
 
         var grid = L.gmxGrid({
             //color: 'white'
-            //isOneDegree: true
+            // isOneDegree: true
         }).addTo(map);
 
-        document.getElementById("changeFormat").onclick = function() {
-            grid.setColor('white');
-        };
+        // document.getElementById("changeFormat").onclick = function() {
+        //     grid.setColor('white');
+        // };
+
+				var setStepBtn = document.getElementById("setStep"),
+						resetStepBtn = document.getElementById("resetStep");
+
+				setStepBtn.onclick = function() {
+						grid.setStep(step.value);
+				}
+
+				resetStepBtn.onclick = function() {
+						grid.clearStep();
+				}
+
 	</script>
 </body>
 </html>
