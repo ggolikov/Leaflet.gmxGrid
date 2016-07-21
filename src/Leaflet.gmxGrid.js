@@ -33,23 +33,11 @@ L.GmxGrid = L.Polyline.extend({
     onAdd: function (map) {
         L.Polyline.prototype.onAdd.call(this, map);
         map.on('move', this.repaint, this);
-
-        var blm = map.gmxBaseLayersManager;
-        this._baselayerCheck = function (ev) {
-            var blayer = ev.baseLayer,
-                color = blayer && blayer.options.overlayColor || 'black';
-            if (this.options.color !==  color) {
-                this.setColor(color);
-            }
-        };
-        blm.on('baselayerchange', this._baselayerCheck, this);
-        this._baselayerCheck({baseLayer: blm.get(blm.getCurrentID())});
         this.repaint();
     },
 
     onRemove: function (map) {
         map.off('move', this.repaint, this);
-        map.gmxBaseLayersManager.off('baselayerchange', this._baselayerCheck, this);
         L.Polyline.prototype.onRemove.call(this, map);
     },
 
