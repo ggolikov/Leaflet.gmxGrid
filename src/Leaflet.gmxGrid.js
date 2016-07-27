@@ -70,7 +70,7 @@ L.GmxGrid = L.Polyline.extend({
             defaultXStep = 0, defaultYStep = 0,
             xStep, yStep,
             isOneDegree = this.options.isOneDegree,
-            customGridStep = this.options.customGridStep, // draws grid in kilometers
+            customGridStep = this.options.customGridStep, // draws grid in kilometers 
             centerY = (map.getCenter().lat * Math.PI) / 180;
 
         for (i = 0; i < gridStepsLength; i++) {

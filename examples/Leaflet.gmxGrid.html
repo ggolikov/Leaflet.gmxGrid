@@ -31,47 +31,57 @@
             box-shadow: 0 1px 7px rgba(0,0,0,0.65);
             padding: 10px;
         }
-    </style>
-</head>
-<body>
-	<div id="map"></div>
-    <div id="infoPanel">
-        <span id="info">
-                <!-- Click for set white <button id="changeFormat">grid color</button> -->
-								Set step (km):
-								<input id="step" type="text"></input>
-								<button id="setStep">set step</button>
-								<button id="resetStep">reset step</button>
-        </span>
-    </div>
-
-	<script>
-		var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-			maxZoom: 18,
-			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
-		});
-		var map = new L.Map('map', {layers: [osm], center: new L.LatLng(50, 20), zoom: 3});
-
-        var grid = L.gmxGrid({
-            //color: 'white'
-            // isOneDegree: true
-        }).addTo(map);
-
-        // document.getElementById("changeFormat").onclick = function() {
-        //     grid.setColor('white');
-        // };
-
-				var setStepBtn = document.getElementById("setStep"),
-						resetStepBtn = document.getElementById("resetStep");
-
-				setStepBtn.onclick = function() {
-						grid.setStep(step.value);
+				#step {
+			width: 40px;
 				}
 
-				resetStepBtn.onclick = function() {
-						grid.clearStep();
-				}
+				    </style>
+				</head>
+				<body>
+					<div id="map"></div>
+				    <div id="infoPanel">
+				        <span id="info">
+				                Set grid color:
+				                <button id="changeColor">black/white</button>
+				                <span>  |  </span>
+												Set grid step (km):
+												<input id="step" type="text"></input>
+												<button id="setStep">set step</button>
+												<button id="resetStep">reset step</button>
+				        </span>
+				    </div>
 
-	</script>
-</body>
-</html>
+					<script>
+						var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+							maxZoom: 18,
+							attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+						});
+						var map = new L.Map('map', {layers: [osm], center: new L.LatLng(50, 20), zoom: 3});
+
+				        var grid = L.gmxGrid({
+				            // color: 'white'
+				            // isOneDegree: true
+				        }).addTo(map);
+
+				        var setColorBtn = document.getElementById("changeColor"),
+				            setStepBtn = document.getElementById("setStep"),
+										resetStepBtn = document.getElementById("resetStep");
+				            console.log(step);
+
+				        setColorBtn.onclick = function() {
+				            grid.options.color === 'black' ? grid.setColor('white') : grid.setColor('black');
+				        };
+
+								setStepBtn.onclick = function() {
+										grid.setStep(step.value);
+								};
+
+								resetStepBtn.onclick = function() {
+										grid.clearStep();
+				            step.value = '';
+				            step.focus();
+								};
+
+					</script>
+				</body>
+				</html>
