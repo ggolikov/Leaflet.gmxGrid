@@ -116,7 +116,7 @@ L.GmxGrid = L.Polyline.extend({
                 textMarkers.push('', '');
               }
             } else {
-              textMarkers.push(formatFloat(x) + '°', '');
+              textMarkers.push(formatFloat(y) + '°', '');
             }
         }
         this.setStyle({'stroke': true, 'weight': 1, 'color': this.options.color});
