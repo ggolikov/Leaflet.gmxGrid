@@ -13,7 +13,11 @@ L.GmxGrid = L.Polyline.extend({
         isOneDegree: false,  // draw with 1°
         color: 'black',
         noClip: true,
-        customGridStep: null,
+        customGridStep: {
+            x: undefined,
+            y: undefined
+        },
+        customGridUnits: 'degrees',
         clickable: false
     },
 
@@ -31,16 +35,30 @@ L.GmxGrid = L.Polyline.extend({
         this.repaint();
     },
 
-    setStep: function (input) {
-        if (!input || isNaN(input) || input <= 0) {
+    // setting grid step (x, y)
+    setStep: function (x, y) {
+        if (!x || isNaN(x) || x <= 0 ) {
             return;
         }
-        this.options.customGridStep = Number(input);
+        if (arguments.length === 1) {
+            this.options.customGridStep.y = this.options.customGridStep.x = x;
+        } else {
+            if (!y || isNaN(y) || y <= 0 ) {
+                return;
+            }
+            this.options.customGridStep.x = x;
+            this.options.customGridStep.y = y;
+        }
+        this.repaint();
+    },
+
+    setUnits: function (unit) {
+        this.options.customGridUnits = unit;
         this.repaint();
     },
 
     clearStep: function () {
-        this.options.customGridStep = null;
+        this.options.customGridStep.x = this.options.customGridStep.y = undefined;
         this.repaint();
     },
 
@@ -70,7 +88,8 @@ L.GmxGrid = L.Polyline.extend({
             defaultXStep = 0, defaultYStep = 0,
             xStep, yStep,
             isOneDegree = this.options.isOneDegree,
-            customGridStep = this.options.customGridStep, // draws grid in kilometers
+            customGridStep = this.options.customGridStep,
+            customGridUnits = this.options.customGridUnits,
             centerY = (map.getCenter().lat * Math.PI) / 180;
 
         for (i = 0; i < gridStepsLength; i++) {
@@ -82,9 +101,14 @@ L.GmxGrid = L.Polyline.extend({
 
         if (isOneDegree) {
             xStep = yStep = 1;
-        } else if (customGridStep) {
-            xStep = (customGridStep/111.31949)/Math.cos(centerY);
-            yStep = customGridStep/111.31949;
+        } else if (customGridStep.x && customGridStep.y) {
+            if (customGridUnits === 'degrees') {
+                xStep = customGridStep.x;
+                yStep = customGridStep.y;
+            } else if (customGridUnits === 'kilometers') {
+                xStep = (customGridStep.x/111.31949)/Math.cos(centerY);
+                yStep = customGridStep.y/111.31949;
+            }
         } else {
             xStep = defaultXStep;
             yStep = defaultYStep;
@@ -96,8 +120,8 @@ L.GmxGrid = L.Polyline.extend({
         for (i = Math.floor(x1 / xStep), len1 = Math.ceil(x2 / xStep); i < len1; i++) {
             var x = i * xStep;
             latlngArr.push(new L.LatLng(y2, x), new L.LatLng(y1, x));
-            if (xStep < defaultXStep && yStep < defaultYStep) {
-                if (i % Math.floor(defaultYStep / yStep) === 0) {
+            if (xStep < defaultXStep || yStep < defaultYStep) {
+                if (i % Math.ceil(defaultXStep / xStep) === 0) {
                     textMarkers.push(formatFloat(x) + '°', '');
                 } else {
                     textMarkers.push('', '');
@@ -109,14 +133,14 @@ L.GmxGrid = L.Polyline.extend({
         for (i = Math.floor(y1 / yStep), len1 = Math.ceil(y2 / yStep); i < len1; i++) {
             var y = i * yStep;
             latlngArr.push(new L.LatLng(y, x1), new L.LatLng(y, x2));
-            if (xStep < defaultXStep && yStep < defaultYStep) {
-              if (i % Math.floor(defaultXStep / xStep) === 0) {
-                textMarkers.push(formatFloat(y) + '°', '');
-              } else {
-                textMarkers.push('', '');
-              }
+            if (xStep < defaultXStep || yStep < defaultYStep) {
+                if (i % Math.ceil(defaultYStep / yStep) === 0) {
+                    textMarkers.push(formatFloat(y) + '°', '');
+                } else {
+                    textMarkers.push('', '');
+                }
             } else {
-              textMarkers.push(formatFloat(y) + '°', '');
+                textMarkers.push(formatFloat(y) + '°', '');
             }
         }
         this.setStyle({'stroke': true, 'weight': 1, 'color': this.options.color});

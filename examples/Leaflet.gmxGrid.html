@@ -31,7 +31,7 @@
             box-shadow: 0 1px 7px rgba(0,0,0,0.65);
             padding: 10px;
         }
-				#step {
+				#xStep, #yStep {
 			width: 40px;
 				}
 
@@ -42,12 +42,16 @@
 				    <div id="infoPanel">
 				        <span id="info">
 				                Set grid color:
-				                <button id="changeColor">black/white</button>
+				                <button id="setColor">black/white</button>
 				                <span>  |  </span>
-												Set grid step (km):
-												<input id="step" type="text"></input>
+												Set grid step size:
+												x: <input id="xStep" type="text"></input>
+												y: <input id="yStep" type="text"></input>
 												<button id="setStep">set step</button>
 												<button id="resetStep">reset step</button>
+												<span>  |  </span>
+												Set grid step units:
+												<button id="setUnits">degrees/kilometers</button>
 				        </span>
 				    </div>
 
@@ -63,23 +67,28 @@
 				            // isOneDegree: true
 				        }).addTo(map);
 
-				        var setColorBtn = document.getElementById("changeColor"),
-				            setStepBtn = document.getElementById("setStep"),
-										resetStepBtn = document.getElementById("resetStep");
-				            console.log(step);
+				        var setColorBtn 	= document.getElementById("setColor"),
+				            setStepBtn 		= document.getElementById("setStep"),
+										resetStepBtn 	= document.getElementById("resetStep");
+										setUnitsBtn 	= document.getElementById("setUnits")
+
 
 				        setColorBtn.onclick = function() {
 				            grid.options.color === 'black' ? grid.setColor('white') : grid.setColor('black');
 				        };
 
 								setStepBtn.onclick = function() {
-										grid.setStep(step.value);
+										grid.setStep(xStep.value, yStep.value);
 								};
 
 								resetStepBtn.onclick = function() {
 										grid.clearStep();
-				            step.value = '';
-				            step.focus();
+				            xStep.value = '';
+				            yStep.value = '';
+								};
+
+								setUnitsBtn.onclick = function() {
+									grid.options.customGridUnits === 'degrees' ? grid.setUnits('kilometers') : grid.setUnits('degrees');
 								};
 
 					</script>
