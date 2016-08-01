@@ -10,14 +10,18 @@ var gridSteps = [0.001, 0.002, 0.0025, 0.005, 0.01, 0.02, 0.025, 0.05, 0.1, 0.2,
 
 L.GmxGrid = L.Polyline.extend({
     options: {
-        isOneDegree: false,  // draw with 1°
+        // isOneDegree: false,  // draw with 1°
         color: 'black',
         noClip: true,
-        customGridStep: {
+        defaultStep: {
             x: undefined,
             y: undefined
         },
-        customGridUnits: 'degrees',
+        customStep: {
+            x: undefined,
+            y: undefined
+        },
+        units: 'degrees',
         clickable: false
     },
 
@@ -30,36 +34,49 @@ L.GmxGrid = L.Polyline.extend({
         this.repaint();
     },
 
-    setOneDegree: function (flag) {
-        this.options.isOneDegree = flag;
-        this.repaint();
-    },
-
     // setting grid step (x, y)
     setStep: function (x, y) {
         if (!x || isNaN(x) || x <= 0 ) {
             return;
         }
         if (arguments.length === 1) {
-            this.options.customGridStep.y = this.options.customGridStep.x = x;
+            this.options.customStep.y = this.options.customStep.x = Number(x);
         } else {
             if (!y || isNaN(y) || y <= 0 ) {
                 return;
             }
-            this.options.customGridStep.x = x;
-            this.options.customGridStep.y = y;
+            this.options.customStep.x = Number(x);
+            this.options.customStep.y = Number(y);
         }
         this.repaint();
     },
 
-    setUnits: function (unit) {
-        this.options.customGridUnits = unit;
+    clearStep: function () {
+        this.options.customStep.x = this.options.customStep.y = undefined;
+        this.options.units = 'degrees';
         this.repaint();
     },
 
-    clearStep: function () {
-        this.options.customGridStep.x = this.options.customGridStep.y = undefined;
-        this.repaint();
+    setUnits: function (units) {
+        if (units === this.options.units) {
+            return;
+        }
+        var centerY = (this._map.getCenter().lat * Math.PI) / 180,
+            x = this.options.customStep.x ? this.options.customStep.x : this.options.defaultStep.x,
+            y = this.options.customStep.y ? this.options.customStep.y : this.options.defaultStep.y;
+        switch (units) {
+            case 'kilometers':
+                this.options.customStep.x = x * Math.cos(centerY) * 111.31949;
+                this.options.customStep.y = y * 111.31949;
+            break;
+            case 'degrees':
+                this.options.customStep.x = (x / 111.31949) / Math.cos(centerY);
+                this.options.customStep.y = y / 111.31949;
+            break;
+            default:
+                return;
+        }
+            this.options.units = units;
     },
 
     onAdd: function (map) {
@@ -76,6 +93,8 @@ L.GmxGrid = L.Polyline.extend({
     repaint: function() {
         if (!this._map) { return false; }
         var map = this._map,
+            x = this.options.customStep.x,
+            y = this.options.customStep.y,
             w = map._size.x / 80,
             h = map._size.y / 80,
             vBounds = map.getBounds(),
@@ -88,8 +107,7 @@ L.GmxGrid = L.Polyline.extend({
             defaultXStep = 0, defaultYStep = 0,
             xStep, yStep,
             isOneDegree = this.options.isOneDegree,
-            customGridStep = this.options.customGridStep,
-            customGridUnits = this.options.customGridUnits,
+            units = this.options.units,
             centerY = (map.getCenter().lat * Math.PI) / 180;
 
         for (i = 0; i < gridStepsLength; i++) {
@@ -99,19 +117,15 @@ L.GmxGrid = L.Polyline.extend({
             if (defaultXStep > 0 && defaultYStep > 0) { break; }
         }
 
-        if (isOneDegree) {
-            xStep = yStep = 1;
-        } else if (customGridStep.x && customGridStep.y) {
-            if (customGridUnits === 'degrees') {
-                xStep = customGridStep.x;
-                yStep = customGridStep.y;
-            } else if (customGridUnits === 'kilometers') {
-                xStep = (customGridStep.x/111.31949)/Math.cos(centerY);
-                yStep = customGridStep.y/111.31949;
-            }
+        if (!x && !y) {
+            this.options.defaultStep.x = xStep = defaultXStep;
+            this.options.defaultStep.y = yStep = defaultYStep;
+        } else if (units === 'kilometers') {
+            xStep = (x/111.31949)/Math.cos(centerY);
+            yStep = y/111.31949;
         } else {
-            xStep = defaultXStep;
-            yStep = defaultYStep;
+            xStep = x;
+            yStep = y;
         }
 
         var latlngArr = [],

@@ -32,7 +32,7 @@
             padding: 10px;
         }
 				#xStep, #yStep {
-			width: 40px;
+			width: 60px;
 				}
 
 				    </style>
@@ -47,11 +47,13 @@
 												Set grid step size:
 												x: <input id="xStep" type="text"></input>
 												y: <input id="yStep" type="text"></input>
-												<button id="setStep">set step</button>
-												<button id="resetStep">reset step</button>
 												<span>  |  </span>
 												Set grid step units:
-												<button id="setUnits">degrees/kilometers</button>
+												<input id="degrees" type="radio" name="units" value="degrees"/> <label for="degrees"> degrees </label>
+												<input id="kilometers" type="radio" name="units" value="kilometers"/> <label for="kilometers"> kilometers </label>
+												<span>  |  </span>
+												<button id="setStep">set step</button>
+												<button id="resetStep">reset step</button>
 				        </span>
 				    </div>
 
@@ -62,34 +64,51 @@
 						});
 						var map = new L.Map('map', {layers: [osm], center: new L.LatLng(50, 20), zoom: 3});
 
-				        var grid = L.gmxGrid({
-				            // color: 'white'
-				            // isOneDegree: true
-				        }).addTo(map);
+				        var grid = L.gmxGrid().addTo(map);
 
 				        var setColorBtn 	= document.getElementById("setColor"),
 				            setStepBtn 		= document.getElementById("setStep"),
-										resetStepBtn 	= document.getElementById("resetStep");
-										setUnitsBtn 	= document.getElementById("setUnits")
+										resetStepBtn 	= document.getElementById("resetStep"),
+										setUnitsBtn 	= document.getElementById("setUnits");
 
+								function updateInputsValues() {
+										xStep.value = grid.options.customStep.x ? Math.floor(grid.options.customStep.x) : grid.options.defaultStep.x;
+										yStep.value = grid.options.customStep.y ? Math.floor(grid.options.customStep.y) : grid.options.defaultStep.y;
+								}
 
-				        setColorBtn.onclick = function() {
+								function handleUnits() {
+										var value = this.value;
+										if (grid.options.units !== value) {
+												grid.setUnits(value);
+										}
+										updateInputsValues();
+								}
+
+				        setColorBtn.onclick = function () {
 				            grid.options.color === 'black' ? grid.setColor('white') : grid.setColor('black');
 				        };
 
-								setStepBtn.onclick = function() {
+								setStepBtn.onclick = function () {
 										grid.setStep(xStep.value, yStep.value);
+										updateInputsValues();
 								};
 
-								resetStepBtn.onclick = function() {
+								resetStepBtn.onclick = function () {
 										grid.clearStep();
-				            xStep.value = '';
-				            yStep.value = '';
+										degrees.checked = true;
+										updateInputsValues();
 								};
 
-								setUnitsBtn.onclick = function() {
-									grid.options.customGridUnits === 'degrees' ? grid.setUnits('kilometers') : grid.setUnits('degrees');
-								};
+								degrees.onclick = handleUnits;
+								kilometers.onclick = handleUnits;
+
+								degrees.checked = true;
+								updateInputsValues();
+
+								map.on('zoomend', function () {
+										grid.repaint();
+										updateInputsValues();
+								});
 
 					</script>
 				</body>
