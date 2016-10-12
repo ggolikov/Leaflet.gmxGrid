@@ -106,7 +106,7 @@ L.GmxGrid = L.Polyline.extend({
             i, len1,
             defaultXStep = 0, defaultYStep = 0,
             xStep, yStep,
-            isOneDegree = this.options.isOneDegree,
+            // isOneDegree = this.options.isOneDegree,
             units = this.options.units,
             centerY = (map.getCenter().lat * Math.PI) / 180;
 
@@ -132,7 +132,7 @@ L.GmxGrid = L.Polyline.extend({
             textMarkers = [];
 
         for (i = Math.floor(x1 / xStep), len1 = Math.ceil(x2 / xStep); i < len1; i++) {
-            var x = i * xStep;
+            x = i * xStep;
             latlngArr.push(new L.LatLng(y2, x), new L.LatLng(y1, x));
             if (xStep < defaultXStep || yStep < defaultYStep) {
                 if (i % Math.ceil(defaultXStep / xStep) === 0) {
@@ -145,7 +145,7 @@ L.GmxGrid = L.Polyline.extend({
             }
         }
         for (i = Math.floor(y1 / yStep), len1 = Math.ceil(y2 / yStep); i < len1; i++) {
-            var y = i * yStep;
+            y = i * yStep;
             latlngArr.push(new L.LatLng(y, x1), new L.LatLng(y, x2));
             if (xStep < defaultXStep || yStep < defaultYStep) {
                 if (i % Math.ceil(defaultYStep / yStep) === 0) {
