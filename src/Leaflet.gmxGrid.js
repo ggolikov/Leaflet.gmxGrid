@@ -1,12 +1,6 @@
 (function () {
 var gridSteps = [0.001, 0.002, 0.0025, 0.005, 0.01, 0.02, 0.025, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 30, 60, 120, 180],
-    gridStepsLength = gridSteps.length,
-    formatFloat = function (f) {
-        f %= 360;
-        if (f > 180) { f -= 360; }
-        else if (f < -180) { f += 360; }
-        return Math.round(f * 1000.0) / 1000.0;
-    };
+    gridStepsLength = gridSteps.length;
 
 L.GmxGrid = L.Polyline.extend({
     options: {
@@ -22,6 +16,7 @@ L.GmxGrid = L.Polyline.extend({
             y: undefined
         },
         units: 'degrees',
+        titleFormat: 0,		// string format for degree titles 0 - decimal, 1 - degree + minutes , 2 - degree + minutes + seconds(decimal)
         clickable: false
     },
 
@@ -90,6 +85,16 @@ L.GmxGrid = L.Polyline.extend({
         L.Polyline.prototype.onRemove.call(this, map);
     },
 
+    formatFloat: function (f) {
+		if (this.options.titleFormat && L.gmxUtil.formatDegrees) {
+			return L.gmxUtil.formatDegrees(f, this.options.titleFormat);
+		}
+        f %= 360;
+        if (f > 180) { f -= 360; }
+        else if (f < -180) { f += 360; }
+        return Math.round(f * 1000.0) / 1000.0 + '°';
+    },
+
     repaint: function() {
         if (!this._map) { return false; }
         var map = this._map,
@@ -136,12 +141,12 @@ L.GmxGrid = L.Polyline.extend({
             latlngArr.push(new L.LatLng(y2, x), new L.LatLng(y1, x));
             if (xStep < defaultXStep || yStep < defaultYStep) {
                 if (i % Math.ceil(defaultXStep / xStep) === 0) {
-                    textMarkers.push(formatFloat(x) + '°', '');
+                    textMarkers.push(this.formatFloat(x), '');
                 } else {
                     textMarkers.push('', '');
                 }
             } else {
-                textMarkers.push(formatFloat(x) + '°', '');
+                textMarkers.push(this.formatFloat(x), '');
             }
         }
         for (i = Math.floor(y1 / yStep), len1 = Math.ceil(y2 / yStep); i < len1; i++) {
@@ -149,12 +154,12 @@ L.GmxGrid = L.Polyline.extend({
             latlngArr.push(new L.LatLng(y, x1), new L.LatLng(y, x2));
             if (xStep < defaultXStep || yStep < defaultYStep) {
                 if (i % Math.ceil(defaultYStep / yStep) === 0) {
-                    textMarkers.push(formatFloat(y) + '°', '');
+                    textMarkers.push(this.formatFloat(y), '');
                 } else {
                     textMarkers.push('', '');
                 }
             } else {
-                textMarkers.push(formatFloat(y) + '°', '');
+                textMarkers.push(this.formatFloat(y), '');
             }
         }
         this.setStyle({'stroke': true, 'weight': 1, 'color': this.options.color});
