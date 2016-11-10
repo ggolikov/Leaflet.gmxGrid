@@ -78,7 +78,6 @@ L.GmxGrid = L.Polyline.extend({
 
     setTitleFormat: function (format) {
         this.options.titleFormat = Number(format);
-        this.repaint();
     },
 
     onAdd: function (map) {
