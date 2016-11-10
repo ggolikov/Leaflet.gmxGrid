@@ -1,4 +1,6 @@
 (function () {
+var KM_PER_DEGREE = 111.31949;
+
 var gridSteps = [0.001, 0.002, 0.0025, 0.005, 0.01, 0.02, 0.025, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 30, 60, 120, 180],
     gridStepsLength = gridSteps.length;
 
@@ -61,17 +63,22 @@ L.GmxGrid = L.Polyline.extend({
             y = this.options.customStep.y ? this.options.customStep.y : this.options.defaultStep.y;
         switch (units) {
             case 'kilometers':
-                this.options.customStep.x = x * Math.cos(centerY) * 111.31949;
-                this.options.customStep.y = y * 111.31949;
+                this.options.customStep.x = x * Math.cos(centerY) * KM_PER_DEGREE;
+                this.options.customStep.y = y * KM_PER_DEGREE;
             break;
             case 'degrees':
-                this.options.customStep.x = (x / 111.31949) / Math.cos(centerY);
-                this.options.customStep.y = y / 111.31949;
+                this.options.customStep.x = (x / KM_PER_DEGREE) / Math.cos(centerY);
+                this.options.customStep.y = y / KM_PER_DEGREE;
             break;
             default:
                 return;
         }
             this.options.units = units;
+    },
+
+    setTitleFormat: function (format) {
+        this.options.titleFormat = Number(format);
+        this.repaint();
     },
 
     onAdd: function (map) {
@@ -126,8 +133,8 @@ L.GmxGrid = L.Polyline.extend({
             this.options.defaultStep.x = xStep = defaultXStep;
             this.options.defaultStep.y = yStep = defaultYStep;
         } else if (units === 'kilometers') {
-            xStep = (x/111.31949)/Math.cos(centerY);
-            yStep = y/111.31949;
+            xStep = (x/KM_PER_DEGREE)/Math.cos(centerY);
+            yStep = y/KM_PER_DEGREE;
         } else {
             xStep = x;
             yStep = y;
