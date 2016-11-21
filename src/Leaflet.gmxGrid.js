@@ -9,6 +9,8 @@ L.GmxGrid = L.Polyline.extend({
         // isOneDegree: false,  // draw with 1°
         color: 'black',
         noClip: true,
+		weight: 1,
+		textWeight: 0,
         defaultStep: {
             x: undefined,
             y: undefined
@@ -26,6 +28,15 @@ L.GmxGrid = L.Polyline.extend({
         L.Polyline.prototype.initialize.call(this, [], options);
     },
 
+    setTextWeight: function (w) {
+        this.options.textWeight = w;
+        this.repaint();
+    },
+
+    setWeight: function (w) {
+        this.options.weight = w;
+        this.repaint();
+    },
     setColor: function (color) {
         this.options.color = color;
         this.repaint();
@@ -168,7 +179,7 @@ L.GmxGrid = L.Polyline.extend({
                 textMarkers.push(this.formatFloat(y), '');
             }
         }
-        this.setStyle({'stroke': true, 'weight': 1, 'color': this.options.color});
+        this.setStyle({'stroke': true, 'weight': this.options.weight, 'color': this.options.color});
         this.options.textMarkers = textMarkers;
         this.setLatLngs(latlngArr);
         return false;
@@ -177,7 +188,7 @@ L.GmxGrid = L.Polyline.extend({
     _getPathPartStr: function (points) {
         if (this._containerText) { this._container.removeChild(this._containerText); }
         this._containerText = this._createElement('g');
-        this._containerText.setAttribute('stroke-width', 0);
+        this._containerText.setAttribute('stroke-width', this.options.textWeight);
 
         var color = this._path.getAttribute('stroke');
         this._containerText.setAttribute('stroke', color);
